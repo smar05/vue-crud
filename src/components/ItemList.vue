@@ -2,23 +2,34 @@
   <div>
     <h2>Item List</h2>
     <ul>
-      <li v-for="item in items" :key="item.id">
+      <li v-for="(item, index) in items" :key="item.id">
+        <strong>{{ index + 1 }}</strong>
         {{ item.name }}
-        <button @click="$emit('edit', item)">Edit</button>
-        <button @click="$emit('delete', item.id)">Delete</button>
+        <button @click="editItem(item)">Edit</button>
+        <button @click="deleteItem(item.id)">Delete</button>
       </li>
     </ul>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { defineProps, defineEmits } from "vue";
+import { IItem } from "@/interfaces/IItem";
 
-export default defineComponent({
-  name: "ItemList",
-  props: {
-    items: Array,
-  },
-  emits: ["edit", "delete"],
-});
+const props = defineProps<{
+  items: IItem[];
+}>();
+
+const emit = defineEmits<{
+  (e: "edit", item: IItem): void;
+  (e: "delete", id: number): void;
+}>();
+
+const editItem = (item: IItem) => {
+  emit("edit", item);
+};
+
+const deleteItem = (id: number) => {
+  emit("delete", id);
+};
 </script>

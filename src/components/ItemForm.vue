@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>{{ isEditing ? "Edit" : "Add" }} IItem</h2>
+    <h2>{{ isEditing ? "Edit" : "Add" }} Item</h2>
     <form @submit.prevent="handleSubmit">
       <div>
         <label for="name">Name</label>
@@ -11,47 +11,37 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, watch } from "vue";
+<script lang="ts" setup>
+import { ref, watch, defineProps, defineEmits } from "vue";
 import { IItem } from "@/interfaces/IItem";
 
-export default defineComponent({
-  name: "ItemForm",
-  props: {
-    itemToEdit: {
-      type: Object as () => IItem | null,
-      default: null,
-    },
-  },
-  emits: ["submit"],
-  setup(props, { emit }) {
-    const item = ref<IItem>({ name: "" });
-    const isEditing = ref(false);
+const props = defineProps<{
+  itemToEdit: IItem | null;
+}>();
 
-    watch(
-      () => props.itemToEdit,
-      (newItem) => {
-        if (newItem && "name" in newItem) {
-          item.value = { ...newItem };
-          isEditing.value = true;
-        } else {
-          item.value = { name: "" };
-          isEditing.value = false;
-        }
-      }
-    );
+const emit = defineEmits<{
+  (e: "submit", item: IItem): void;
+}>();
 
-    const handleSubmit = () => {
-      emit("submit", item.value);
+const item = ref<IItem>({ name: "" });
+const isEditing = ref(false);
+
+watch(
+  () => props.itemToEdit,
+  (newItem) => {
+    if (newItem && "name" in newItem) {
+      item.value = { ...newItem };
+      isEditing.value = true;
+    } else {
       item.value = { name: "" };
       isEditing.value = false;
-    };
+    }
+  }
+);
 
-    return {
-      item,
-      isEditing,
-      handleSubmit,
-    };
-  },
-});
+const handleSubmit = () => {
+  emit("submit", item.value);
+  item.value = { name: "" };
+  isEditing.value = false;
+};
 </script>
